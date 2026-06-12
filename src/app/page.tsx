@@ -63,6 +63,7 @@ export default function Home() {
         onKey={inputChar}
         onDelete={deleteChar}
         onEnter={submit}
+        onReset={reset}
       />
     );
   }

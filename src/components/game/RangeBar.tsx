@@ -8,9 +8,10 @@ type RangeBarProps = {
   answer: WordData;
   lowWord: string | null;
   highWord: string | null;
+  showDot: boolean; // 初回回答後にtrueになる
 };
 
-export function RangeBar({ candidates, answer, lowWord, highWord }: RangeBarProps) {
+export function RangeBar({ candidates, answer, lowWord, highWord, showDot }: RangeBarProps) {
   const position = calcAnswerPosition(candidates, answer.word);
   const posPercent = Math.round(position * 100);
 
@@ -36,14 +37,26 @@ export function RangeBar({ candidates, answer, lowWord, highWord }: RangeBarProp
         <div className="absolute left-0 w-0.5 h-4 bg-primary-400 rounded-full" />
         {/* 右端マーカー */}
         <div className="absolute right-0 w-0.5 h-4 bg-primary-400 rounded-full" />
-        {/* 正解位置ドット */}
-        <div
-          className="absolute w-5 h-5 rounded-full bg-accent shadow-md border-2 border-white transition-all duration-300"
-          style={{ left: `calc(${posPercent}% - 10px)` }}
-        />
+        {/* 正解位置ドット（初回回答後のみ表示） */}
+        {showDot ? (
+          <div
+            className="absolute w-5 h-5 rounded-full bg-accent shadow-md border-2 border-white transition-all duration-500"
+            style={{ left: `calc(${posPercent}% - 10px)` }}
+          />
+        ) : (
+          /* 未回答時はクエスチョンマーク */
+          <div className="absolute left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gray-200 border-2 border-white shadow-sm flex items-center justify-center">
+            <span className="text-gray-400 text-xs font-bold">?</span>
+          </div>
+        )}
       </div>
 
-      {/* 候補数表示エリア（バーの下） */}
+      {/* 未回答ヒント */}
+      {!showDot && (
+        <p className="text-center text-xs text-gray-400 mt-1">
+          最初の回答で位置が表示されます
+        </p>
+      )}
     </div>
   );
 }
