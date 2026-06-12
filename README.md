@@ -1,64 +1,92 @@
-# はば単ゲーム
+# はば単ゲーム 🎮
 
-兵庫県の中学生向け英単語帳「はば単（第２版）」の2,380語を使った探索型英単語ゲームです。
+兵庫県の中学生向け英単語帳「はば単（第２版）」を使った探索型英単語ゲームです。
 
-## ローカル起動
+## 🌐 公開URL
 
-```bash
-npm install
-npm run dev
-# http://localhost:3000 で起動
-```
+> デプロイ後にVercelのURLを記載してください
 
-## Vercelへのデプロイ（無料）
+---
 
-### 方法1: Vercel CLIで直接デプロイ
+## 🎯 ゲームの特徴
 
-```bash
-npm install
-npm i -g vercel
-vercel
-```
+**「書ける」よりも「知っている・読める」** を重視した学習ゲームです。
 
-### 方法2: GitHubからデプロイ（推奨）
+- 📚 はば単第２版 収録の **2,380語** を使用
+- 🔍 二分探索で正解を絞り込む探索型ゲーム
+- 📊 バーで正解の位置がひと目でわかる
+- ⌨️ スマホ対応の埋め込みキーボード
+- 🏆 理論値との比較でスコアをランク評価
 
-1. このフォルダをGitHubリポジトリにpush
-   ```bash
-   git init
-   git add .
-   git commit -m "initial commit"
-   gh repo create habatan --public --push
-   ```
-2. [vercel.com](https://vercel.com) でGitHubアカウントでログイン
-3. 「New Project」→ リポジトリを選択 → 「Deploy」
-4. 自動でURLが発行される（例: `habatan.vercel.app`）
+---
 
-以降はGitHubにpushするたびに自動デプロイされます。
+## 📱 スクリーンショット
 
-## 単語データ
+| 品詞選択 | ゲーム画面 | 結果画面 |
+|---|---|---|
+| （画像） | （画像） | （画像） |
 
-`public/words.json` に2,380語が入っています。
-はば単第２版 から変換済みです（特殊文字を含む11語を除外）。
+---
+
+## 🕹️ あそびかた
+
+1. **品詞を選ぶ**（全単語 / 名詞 / 動詞 / 形容詞 / 副詞）
+2. **単語を入力して送信**する
+3. 回答するたびに**探索範囲がせばまる**
+4. **バーで正解の位置**を確認しながら絞り込む
+5. 少ない手数で当てるほど**高スコア**！
+
+### スコアランク
+
+| ランク | 条件 |
+|---|---|
+| S | 理論値より2手以上少ない |
+| A | 理論値 ±1手以内 |
+| B | 理論値 +2〜3手 |
+| C | 理論値 +4〜5手 |
+| D | 理論値 +6手以上 |
+
+> 理論値 = ceil(log2(候補数))　例：2,380語なら12手
+
+---
+
+## 🗂️ 単語データ
+
+はば単第２版（兵庫県教育委員会）から変換した **2,380語**を収録しています。
 
 | 品詞 | 語数 |
 |---|---|
-| 名詞 (noun) | 1,425 |
-| 動詞 (verb) | 412 |
-| 形容詞 (adjective) | 326 |
-| 副詞 (adverb) | 118 |
-| その他 (冠詞・前置詞等) | 99 |
+| 名詞 | 1,425 |
+| 動詞 | 412 |
+| 形容詞 | 326 |
+| 副詞 | 118 |
+| その他（冠詞・前置詞・接続詞等） | 99 |
 | **合計** | **2,380** |
 
-## ディレクトリ構成
+---
 
+## 🛠️ 技術スタック
+
+- [Next.js 16](https://nextjs.org/) (App Router)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vercel](https://vercel.com/)（ホスティング）
+
+---
+
+## 🚀 ローカルで動かす
+
+```bash
+git clone https://github.com/あなたのユーザー名/habatan.git
+cd habatan
+npm install
+npm run dev
 ```
-src/
-├── app/              # Next.js App Router
-├── components/
-│   ├── game/         # RangeBar / Keyboard / CandidateCount
-│   ├── screens/      # SelectScreen / GameScreen / ResultScreen
-│   └── ui/           # Button
-├── hooks/useGame.ts  # useReducerによる状態管理
-├── lib/              # ゲームロジック・キーヒント計算
-└── types/            # 型定義
-```
+
+ブラウザで [http://localhost:3000](http://localhost:3000) を開く
+
+---
+
+## 📄 ライセンス
+
+単語データは兵庫県教育委員会「はばたけ世界へ！はば単2,500（第２版）」を使用しています。
