@@ -74,19 +74,6 @@
 
 ---
 
-## 🚀 ローカルで動かす
-
-```bash
-git clone https://github.com/あなたのユーザー名/habatan.git
-cd habatan
-npm install
-npm run dev
-```
-
-ブラウザで [http://localhost:3000](http://localhost:3000) を開く
-
----
-
 ## 📄 ライセンス
 
 単語データは兵庫県教育委員会「はばたけ世界へ！はば単2,500（第２版）」を使用しています。
