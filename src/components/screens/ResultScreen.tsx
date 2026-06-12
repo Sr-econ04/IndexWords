@@ -1,0 +1,142 @@
+"use client";
+
+import type { GameState } from "@/types";
+import { calcTheoretical, calcRank, posLabel, filterLabel } from "@/lib/gameLogic";
+import { Button } from "@/components/ui/Button";
+
+type ResultScreenProps = {
+  state: GameState & { phase: "result" };
+  onRetry: () => void;
+  onReset: () => void;
+};
+
+const RANK_CONFIG: Record<
+  string,
+  { label: string; color: string; bg: string; message: string }
+> = {
+  S: {
+    label: "S",
+    color: "text-yellow-600",
+    bg: "bg-yellow-50 border-yellow-200",
+    message: "完璧！理論を超えた神プレイ！",
+  },
+  A: {
+    label: "A",
+    color: "text-primary-600",
+    bg: "bg-primary-50 border-primary-200",
+    message: "すばらしい！ほぼ完璧な絞り込み！",
+  },
+  B: {
+    label: "B",
+    color: "text-green-600",
+    bg: "bg-green-50 border-green-200",
+    message: "いい感じ！もう少しで理論値だ！",
+  },
+  C: {
+    label: "C",
+    color: "text-orange-500",
+    bg: "bg-orange-50 border-orange-200",
+    message: "惜しい！範囲の絞り方を工夫しよう",
+  },
+  D: {
+    label: "D",
+    color: "text-red-500",
+    bg: "bg-red-50 border-red-200",
+    message: "次はもっと上を目指そう！",
+  },
+};
+
+export function ResultScreen({ state, onRetry, onReset }: ResultScreenProps) {
+  const { answer, moves } = state;
+  const theoretical = calcTheoretical(state.pool.length);
+  const rank = calcRank(moves, theoretical);
+  const config = RANK_CONFIG[rank];
+
+  return (
+    <div className="min-h-screen bg-surface flex flex-col">
+      {/* ヘッダー */}
+      <div className="bg-primary-600 text-white px-5 pt-12 pb-6 text-center">
+        <p className="text-primary-200 text-sm mb-1">正解！</p>
+        <h2 className="text-4xl font-black font-mono tracking-wide">
+          {answer.word}
+        </h2>
+      </div>
+
+      <div className="flex-1 px-5 py-6 flex flex-col gap-4">
+        {/* 単語情報カード */}
+        <div className="bg-card rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-gray-400 text-xs mb-1">意味</p>
+              <p className="text-gray-800 text-xl font-bold">{answer.meaning}</p>
+            </div>
+            <span className="ml-3 mt-0.5 bg-primary-100 text-primary-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap">
+              {posLabel(answer.partOfSpeech)}
+            </span>
+          </div>
+        </div>
+
+        {/* スコアカード */}
+        <div className={`rounded-2xl p-5 border ${config.bg}`}>
+          {/* ランク */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-gray-500 text-xs mb-0.5">ランク</p>
+              <p className={`text-5xl font-black ${config.color}`}>
+                {config.label}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-gray-500 text-xs mb-1">手数</p>
+              <p className="text-3xl font-black text-gray-800">
+                {moves}
+                <span className="text-base font-normal text-gray-400 ml-1">手</span>
+              </p>
+            </div>
+          </div>
+
+          {/* 理論値との比較バー */}
+          <div className="mb-3">
+            <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <span>理論値（最小 {theoretical} 手）</span>
+              <span>{moves} 手</span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  rank === "S" || rank === "A"
+                    ? "bg-primary-500"
+                    : rank === "B"
+                    ? "bg-green-500"
+                    : rank === "C"
+                    ? "bg-orange-400"
+                    : "bg-red-400"
+                }`}
+                style={{
+                  width: `${Math.min(
+                    100,
+                    (theoretical / Math.max(moves, theoretical)) * 100
+                  )}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          <p className={`text-sm font-medium ${config.color}`}>
+            {config.message}
+          </p>
+        </div>
+
+        {/* アクションボタン */}
+        <div className="flex flex-col gap-3 mt-2">
+          <Button variant="primary" fullWidth onClick={onRetry}>
+            もう1問（{filterLabel(state.filter)}）
+          </Button>
+          <Button variant="secondary" fullWidth onClick={onReset}>
+            条件を変更する
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
