@@ -103,7 +103,7 @@ function reducer(state: GameState, action: GameAction): GameState {
     }
 
     case "RETRY": {
-      if (state.phase !== "result") return state;
+      if (state.phase !== "result" && state.phase !== "giveup") return state;
       const newAnswer = pickRandom(state.pool);
       return {
         phase: "playing",
