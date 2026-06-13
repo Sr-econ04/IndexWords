@@ -140,24 +140,23 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
                     <span>angry</span>
                     <span>teacher</span>
                   </div>
-                  <div className="relative h-4 flex items-center">
-                    <div className="w-full h-2 bg-primary-100 rounded-full" />
-                    <div className="absolute left-0 w-0.5 h-4 bg-primary-300 rounded-full" />
-                    <div className="absolute right-0 w-0.5 h-4 bg-primary-300 rounded-full" />
-                    {/* ●を60%位置に */}
-                    <div
-                      className="absolute w-4 h-4 rounded-full bg-orange-400 border-2 border-white shadow"
-                      style={{ left: "calc(60% - 8px)" }}
-                    />
-                  </div>
-                  {/* ●の真下にラベル */}
-                  <div className="relative h-4 mt-0.5">
-                    <p
-                      className="absolute text-xs text-orange-400 font-medium whitespace-nowrap -translate-x-1/2"
-                      style={{ left: "60%" }}
-                    >
-                      ▲ 正解はこのあたり
-                    </p>
+                  {/* ●とラベルを同じrelativeコンテナで管理してズレをなくす */}
+                  <div className="relative" style={{ height: "48px" }}>
+                    {/* トラック */}
+                    <div className="absolute top-2 left-0 right-0 h-2 bg-primary-100 rounded-full" />
+                    {/* 左端マーカー */}
+                    <div className="absolute top-0 left-0 w-0.5 h-4 bg-primary-300 rounded-full" />
+                    {/* 右端マーカー */}
+                    <div className="absolute top-0 right-0 w-0.5 h-4 bg-primary-300 rounded-full" />
+                    {/* ● と ▲ラベルをまとめて60%に配置 */}
+                    <div className="absolute" style={{ left: "60%", top: 0 }}>
+                      <div className="relative flex flex-col items-center" style={{ transform: "translateX(-50%)" }}>
+                        <div className="w-4 h-4 rounded-full bg-orange-400 border-2 border-white shadow" />
+                        <p className="text-xs text-orange-400 font-medium whitespace-nowrap mt-1">
+                          ▲ 正解はこのあたり
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
