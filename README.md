@@ -50,9 +50,9 @@
 
 ## ローカルでの起動方法
 
-git clone https://github.com/あなたのユーザー名/IndexWords.git
-cd IndexWords
-npm install
-npm run dev
+git clone https://github.com/あなたのユーザー名/IndexWords.git\\
+cd IndexWords\\
+npm install\\
+npm run dev\\
 
 ブラウザで http://localhost:3000 を開く
