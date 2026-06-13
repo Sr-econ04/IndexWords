@@ -14,22 +14,33 @@ export function filterWords(words: WordData[], filter: FilterMode): WordData[] {
 }
 
 /**
- * 探索範囲内の候補インデックス範囲を返す
- * @returns { lowIndex, highIndex } pool基準のinclusive範囲
+ * 探索範囲内の候補を返す（上限・下限の単語自体は除外 = exclusive）
+ * ただし正解単語は除外しない
  */
 export function getCandidates(
   pool: WordData[],
   lowIndex: number,
-  highIndex: number
+  highIndex: number,
+  answerWord: string
 ): WordData[] {
-  return pool.slice(lowIndex, highIndex + 1);
+  return pool.slice(lowIndex, highIndex + 1).filter((w, i) => {
+    const isLower = lowIndex + i === lowIndex;
+    const isUpper = lowIndex + i === highIndex;
+    const isAnswer = w.word.toLowerCase() === answerWord.toLowerCase();
+    // 境界単語でも正解なら残す
+    if (isAnswer) return true;
+    // 初期状態（全体範囲）は除外しない
+    if (lowIndex === 0 && highIndex === pool.length - 1) return true;
+    // 境界単語を除外
+    if (isLower || isUpper) return false;
+    return true;
+  });
 }
 
 /**
  * 回答後の範囲更新
- * answer > guess → 下限を更新（guessのpool内インデックスをlowに）
- * answer < guess → 上限を更新（guessのpool内インデックスをhighに）
- * @returns 新しい { rangeLowIndex, rangeHighIndex }
+ * answer > guess → 下限をguessに更新
+ * answer < guess → 上限をguessに更新
  */
 export function updateRange(
   pool: WordData[],
@@ -42,7 +53,6 @@ export function updateRange(
     (w) => w.word.toLowerCase() === guessWord.toLowerCase()
   );
   if (guessIndex === -1) {
-    // 見つからない場合は変更なし（通常ここには来ない）
     return { rangeLowIndex: currentLow, rangeHighIndex: currentHigh };
   }
 
@@ -50,13 +60,11 @@ export function updateRange(
   const guessLower = guessWord.toLowerCase();
 
   if (answerLower > guessLower) {
-    // 正解はguessより後ろ → 下限をguessに更新
     return {
       rangeLowIndex: Math.max(guessIndex, currentLow),
       rangeHighIndex: currentHigh,
     };
   } else {
-    // 正解はguessより前 → 上限をguessに更新
     return {
       rangeLowIndex: currentLow,
       rangeHighIndex: Math.min(guessIndex, currentHigh),
@@ -87,7 +95,7 @@ export function calcRank(moves: number, theoretical: number): ScoreRank {
 
 /**
  * 正解位置をバー用に 0.0〜1.0 で返す
- * candidates内の順位（0始まり）/ (candidates.length - 1)
+ * candidates内の順位 / (candidates.length - 1)
  */
 export function calcAnswerPosition(
   candidates: WordData[],
@@ -127,4 +135,9 @@ export function filterLabel(filter: FilterMode): string {
     adverb: "副詞",
   };
   return map[filter];
+}
+
+/** プール内の単語を検索して返す */
+export function findWord(pool: WordData[], word: string): WordData | undefined {
+  return pool.find((w) => w.word.toLowerCase() === word.toLowerCase());
 }

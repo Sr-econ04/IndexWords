@@ -11,7 +11,6 @@ import {
   sortWords,
 } from "@/lib/gameLogic";
 
-// ゲーム開始時の初期ゲーム状態を組み立てる
 function buildPlayingState(
   filter: FilterMode,
   allWords: WordData[]
@@ -27,15 +26,14 @@ function buildPlayingState(
     rangeHighIndex: pool.length - 1,
     moves: 0,
     input: "",
+    usedWords: new Set<string>(),
   };
 }
 
 function reducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "START_GAME": {
-      return {
-        ...buildPlayingState(action.filter, action.pool),
-      };
+      return buildPlayingState(action.filter, action.pool);
     }
 
     case "INPUT_CHAR": {
@@ -50,28 +48,43 @@ function reducer(state: GameState, action: GameAction): GameState {
 
     case "SUBMIT": {
       if (state.phase !== "playing") return state;
-      const { input, answer, pool, rangeLowIndex, rangeHighIndex, moves } =
-        state;
+      const { input, answer, pool, rangeLowIndex, rangeHighIndex, moves, usedWords } = state;
 
-      // 入力チェック: プール内に存在する単語のみ受け付ける
       const exists = pool.some(
         (w) => w.word.toLowerCase() === input.toLowerCase()
       );
       if (!exists) return state;
 
-      // 正解判定
-      if (isCorrect(input, answer.word)) {
-        return { ...state, phase: "result", moves: moves + 1, input: "" };
+      // 過去に使った単語・現在の上限下限単語は受け付けない
+      const isInitial = rangeLowIndex === 0 && rangeHighIndex === pool.length - 1;
+      const lowWord = pool[rangeLowIndex]?.word.toLowerCase();
+      const highWord = pool[rangeHighIndex]?.word.toLowerCase();
+      const inputLower = input.toLowerCase();
+      const answerLower = answer.word.toLowerCase();
+
+      if (usedWords.has(inputLower)) return state;
+      // 境界単語は正解でない限り入力不可（初期状態を除く）
+      if (!isInitial && inputLower !== answerLower) {
+        if (inputLower === lowWord || inputLower === highWord) return state;
       }
 
-      // 不正解 → 範囲更新
+      const newUsed = new Set([...usedWords, inputLower]);
+
+      // 正解判定
+      if (isCorrect(input, answer.word)) {
+        return { ...state, phase: "result", moves: moves + 1, input: "", usedWords: newUsed };
+      }
+
+      // 不正解 → 範囲更新、新たな境界単語も自動的にusedWordsへ追加
       const { rangeLowIndex: newLow, rangeHighIndex: newHigh } = updateRange(
-        pool,
-        answer.word,
-        input,
-        rangeLowIndex,
-        rangeHighIndex
+        pool, answer.word, input, rangeLowIndex, rangeHighIndex
       );
+
+      // 新しい境界もusedWordsに追加しておく（正解でなければ）
+      const newLowWord = pool[newLow]?.word.toLowerCase();
+      const newHighWord = pool[newHigh]?.word.toLowerCase();
+      if (newLowWord && newLowWord !== answerLower) newUsed.add(newLowWord);
+      if (newHighWord && newHighWord !== answerLower) newUsed.add(newHighWord);
 
       return {
         ...state,
@@ -79,12 +92,12 @@ function reducer(state: GameState, action: GameAction): GameState {
         rangeHighIndex: newHigh,
         moves: moves + 1,
         input: "",
+        usedWords: newUsed,
       };
     }
 
     case "RETRY": {
       if (state.phase !== "result") return state;
-      // poolはすでにフィルタ・ソート済み → そのまま再利用
       const newAnswer = pickRandom(state.pool);
       return {
         phase: "playing",
@@ -95,11 +108,11 @@ function reducer(state: GameState, action: GameAction): GameState {
         rangeHighIndex: state.pool.length - 1,
         moves: 0,
         input: "",
+        usedWords: new Set<string>(),
       };
     }
 
     case "RESET": {
-      // 完全リセット → select画面へ
       return {
         phase: "select",
         filter: "all",
@@ -109,6 +122,7 @@ function reducer(state: GameState, action: GameAction): GameState {
         rangeHighIndex: 0,
         moves: 0,
         input: "",
+        usedWords: new Set<string>(),
       };
     }
 
@@ -126,6 +140,7 @@ const initialState: GameState = {
   rangeHighIndex: 0,
   moves: 0,
   input: "",
+  usedWords: new Set<string>(),
 };
 
 export function useGame(allWords: WordData[]) {
@@ -158,11 +173,25 @@ export function useGame(allWords: WordData[]) {
     dispatch({ type: "RESET" });
   }, []);
 
-  // 派生値
-  const candidates =
+  // candidatesは境界exclusive・usedWords除外（正解は残す）
+  const rawCandidates =
     state.phase === "playing" || state.phase === "result"
-      ? getCandidates(state.pool, state.rangeLowIndex, state.rangeHighIndex)
+      ? getCandidates(
+          state.pool,
+          state.rangeLowIndex,
+          state.rangeHighIndex,
+          state.answer.word
+        )
       : [];
+
+  const candidates =
+    state.phase === "playing"
+      ? rawCandidates.filter(
+          (w) =>
+            !state.usedWords.has(w.word.toLowerCase()) ||
+            w.word.toLowerCase() === state.answer.word.toLowerCase()
+        )
+      : rawCandidates;
 
   return {
     state,

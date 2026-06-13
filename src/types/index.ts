@@ -25,6 +25,8 @@ export type GameState = {
   moves: number;
   /** 現在の入力文字列 */
   input: string;
+  /** 過去に入力した単語（小文字）のセット */
+  usedWords: Set<string>;
 };
 
 export type ScoreRank = "S" | "A" | "B" | "C" | "D";
@@ -36,7 +38,6 @@ export type GameResult = {
   rank: ScoreRank;
 };
 
-// キーボードキーの状態
 export type KeyState = "active" | "disabled";
 
 export type GameAction =

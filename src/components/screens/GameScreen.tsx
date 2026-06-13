@@ -2,10 +2,9 @@
 
 import type { GameState, WordData } from "@/types";
 import { RangeBar } from "@/components/game/RangeBar";
-import { CandidateCount } from "@/components/game/CandidateCount";
 import { Keyboard } from "@/components/game/Keyboard";
 import { getKeyStates } from "@/lib/keyboardHints";
-import { filterLabel } from "@/lib/gameLogic";
+import { filterLabel, calcTheoretical, findWord } from "@/lib/gameLogic";
 
 type GameScreenProps = {
   state: GameState & { phase: "playing" };
@@ -24,29 +23,46 @@ export function GameScreen({
   onEnter,
   onReset,
 }: GameScreenProps) {
-  const { pool, answer, input, moves, filter, rangeLowIndex, rangeHighIndex } =
-    state;
+  const { pool, answer, input, moves, filter, rangeLowIndex, rangeHighIndex, usedWords } = state;
 
   const keyStates = getKeyStates(candidates, input);
 
-  const canEnter =
-    input.length > 0 &&
-    pool.some((w) => w.word.toLowerCase() === input.toLowerCase());
+  const inputLower = input.toLowerCase();
+  const answerLower = answer.word.toLowerCase();
+  const isInitial = rangeLowIndex === 0 && rangeHighIndex === pool.length - 1;
+  const lowWord = pool[rangeLowIndex]?.word.toLowerCase();
+  const highWord = pool[rangeHighIndex]?.word.toLowerCase();
 
-  const lowWord = pool[rangeLowIndex]?.word ?? null;
-  const highWord = pool[rangeHighIndex]?.word ?? null;
-  const isInitialRange =
-    rangeLowIndex === 0 && rangeHighIndex === pool.length - 1;
+  const existsInPool = pool.some((w) => w.word.toLowerCase() === inputLower);
+  const alreadyUsed = usedWords.has(inputLower);
+  const isBoundary = !isInitial && inputLower !== answerLower &&
+    (inputLower === lowWord || inputLower === highWord);
 
-  // 1手以上回答していたらドット表示
+  const canEnter = input.length > 0 && existsInPool && !alreadyUsed && !isBoundary;
+
   const showDot = moves > 0;
+  const theoretical = calcTheoretical(pool.length);
+
+  // 入力中の単語の意味（プール内に存在すれば表示）
+  const inputWordData = input.length > 0 ? findWord(pool, input) : undefined;
+
+  // 入力フィードバックメッセージ
+  let feedbackMsg: { text: string; color: string } | null = null;
+  if (input.length > 0) {
+    if (alreadyUsed || isBoundary) {
+      feedbackMsg = { text: "この単語はすでに使われています", color: "text-red-400" };
+    } else if (!existsInPool) {
+      feedbackMsg = { text: "はば単にない単語です", color: "text-amber-500" };
+    } else {
+      feedbackMsg = { text: "ENTERで送信", color: "text-primary-500" };
+    }
+  }
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
       {/* ヘッダー */}
-      <div className="bg-primary-600 text-white px-4 py-3 flex justify-between items-center">
+      <div className="bg-primary-600 text-white px-4 py-3 flex justify-between items-center relative">
         <div className="flex items-center gap-2">
-          {/* トップに戻るボタン */}
           <button
             onClick={onReset}
             className="text-primary-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-primary-500"
@@ -60,22 +76,27 @@ export function GameScreen({
             {filterLabel(filter)}
           </span>
         </div>
-        <span className="text-xs text-primary-200">{moves}手目</span>
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-baseline gap-1">
+          <span className="text-2xl font-black text-white leading-none">{moves}</span>
+          <span className="text-xs text-primary-200">/ {theoretical}手</span>
+        </div>
+        <div className="flex items-baseline gap-0.5">
+          <span className="text-sm font-bold text-white">{candidates.length.toLocaleString()}</span>
+          <span className="text-xs text-primary-300">語</span>
+        </div>
       </div>
 
-      {/* メインエリア：PCでは中央カラム、スマホでは全幅 */}
+      {/* メインエリア */}
       <div className="flex-1 flex flex-col w-full max-w-lg mx-auto px-4 py-4 gap-4">
-        {/* 候補数 + ヒントバー */}
+
+        {/* ヒントバー */}
         <div className="bg-card rounded-2xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-gray-400 font-medium">残り候補数</p>
-            <CandidateCount current={candidates.length} total={pool.length} />
-          </div>
+          <p className="text-xs text-gray-400 font-medium mb-3">探索範囲</p>
           <RangeBar
             candidates={candidates}
             answer={answer}
-            lowWord={isInitialRange ? null : lowWord}
-            highWord={isInitialRange ? null : highWord}
+            lowWord={isInitial ? null : pool[rangeLowIndex]?.word ?? null}
+            highWord={isInitial ? null : pool[rangeHighIndex]?.word ?? null}
             showDot={showDot}
           />
         </div>
@@ -85,27 +106,32 @@ export function GameScreen({
           <p className="text-xs text-gray-400 mb-2">入力中の単語</p>
           <div className="flex items-end gap-1 min-h-[2.5rem]">
             {input.length === 0 ? (
-              <span className="text-gray-300 text-2xl font-mono tracking-widest">
-                ＿
-              </span>
+              <span className="text-gray-300 text-2xl font-mono tracking-widest">＿</span>
             ) : (
               <>
-                <span className="text-2xl font-mono font-bold text-gray-800 tracking-wider">
+                <span className={`text-2xl font-mono font-bold tracking-wider ${
+                  alreadyUsed || isBoundary ? "text-red-300" : "text-gray-800"
+                }`}>
                   {input}
                 </span>
                 <span className="w-0.5 h-7 bg-primary-500 rounded animate-pulse mb-0.5" />
               </>
             )}
           </div>
-          <div className="mt-1 h-0.5 bg-primary-200 rounded" />
-          <p className="mt-1.5 text-xs h-4">
-            {input.length > 0 && !canEnter && (
-              <span className="text-amber-500">はば単にない単語です</span>
-            )}
-            {canEnter && (
-              <span className="text-primary-500">ENTERで送信</span>
-            )}
-          </p>
+          <div className={`mt-1 h-0.5 rounded ${alreadyUsed || isBoundary ? "bg-red-200" : "bg-primary-200"}`} />
+
+          {/* 入力した単語の意味 */}
+          {inputWordData && !alreadyUsed && !isBoundary ? (
+            <p className="mt-2 text-sm text-gray-600 font-medium">
+              {inputWordData.meaning}
+            </p>
+          ) : (
+            <p className="mt-1.5 text-xs h-4">
+              {feedbackMsg && (
+                <span className={feedbackMsg.color}>{feedbackMsg.text}</span>
+              )}
+            </p>
+          )}
         </div>
 
         <div className="flex-1" />
