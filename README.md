@@ -3,7 +3,7 @@
 探索型英単語ゲームです。  
 兵庫県の中学生向け英単語帳「はば単（第２版）」を使用しています。
 
-🎮 **[今すぐ遊ぶ](https://your-app.vercel.app)**
+🎮 **[今すぐ遊ぶ](https://index-words-wcu7.vercel.app/)**
 
 ---
 
