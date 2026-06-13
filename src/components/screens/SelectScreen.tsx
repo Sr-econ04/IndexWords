@@ -1,6 +1,7 @@
 "use client";
 
 import type { FilterMode } from "@/types";
+import { Footer } from "@/components/ui/Footer";
 
 type SelectScreenProps = {
   totalCount: number;
@@ -187,5 +188,6 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
         </div>
       </div>
     </div>
+    <Footer />
   );
 }

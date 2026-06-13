@@ -118,6 +118,11 @@ function reducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case "GIVE_UP": {
+      if (state.phase !== "playing") return state;
+      return { ...state, phase: "giveup" };
+    }
+
     case "RESET": {
       return {
         phase: "select",
@@ -179,9 +184,13 @@ export function useGame(allWords: WordData[]) {
     dispatch({ type: "RESET" });
   }, []);
 
+  const giveUp = useCallback(() => {
+    dispatch({ type: "GIVE_UP" });
+  }, []);
+
   // 候補：境界exclusive（番兵インデックス対応）・usedWords除外（正解は残す）
   const rawCandidates =
-    state.phase === "playing" || state.phase === "result"
+    state.phase === "playing" || state.phase === "result" || state.phase === "giveup"
       ? getCandidates(
           state.pool,
           state.rangeLowIndex,
@@ -208,5 +217,6 @@ export function useGame(allWords: WordData[]) {
     submit,
     retry,
     reset,
+    giveUp,
   };
 }

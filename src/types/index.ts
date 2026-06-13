@@ -8,7 +8,7 @@ export type WordData = {
 
 export type FilterMode = PartOfSpeech | "all";
 
-export type GamePhase = "select" | "playing" | "result";
+export type GamePhase = "select" | "playing" | "result" | "giveup";
 
 export type GameState = {
   phase: GamePhase;
@@ -46,4 +46,5 @@ export type GameAction =
   | { type: "DELETE_CHAR" }
   | { type: "SUBMIT" }
   | { type: "RETRY" }
+  | { type: "GIVE_UP" }
   | { type: "RESET" };

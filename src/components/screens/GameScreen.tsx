@@ -5,6 +5,7 @@ import { RangeBar } from "@/components/game/RangeBar";
 import { Keyboard } from "@/components/game/Keyboard";
 import { getKeyStates } from "@/lib/keyboardHints";
 import { filterLabel, calcTheoretical, findWord } from "@/lib/gameLogic";
+import { Footer } from "@/components/ui/Footer";
 
 type GameScreenProps = {
   state: GameState & { phase: "playing" };
@@ -13,6 +14,7 @@ type GameScreenProps = {
   onDelete: () => void;
   onEnter: () => void;
   onReset: () => void;
+  onGiveUp: () => void;
 };
 
 export function GameScreen({
@@ -22,6 +24,8 @@ export function GameScreen({
   onDelete,
   onEnter,
   onReset,
+  onGiveUp,
+  onGiveUp,
 }: GameScreenProps) {
   const { pool, answer, input, moves, filter, rangeLowIndex, rangeHighIndex, usedWords } = state;
 
@@ -77,10 +81,19 @@ export function GameScreen({
           </span>
         </div>
 
-        {/* 手数：現在の回答数のみ、上限のイメージを与えない */}
-        <div className="flex items-baseline gap-1">
+        <div className="flex items-center gap-3">
+          {/* 降参ボタン */}
+          <button
+            onClick={onGiveUp}
+            className="text-xs text-gray-300 hover:text-white border border-gray-400 hover:border-white rounded-lg px-2 py-1 transition-colors"
+          >
+            降参
+          </button>
+          {/* 手数 */}
+          <div className="flex items-baseline gap-1">
           <span className="text-2xl font-black text-white leading-none">{moves}</span>
           <span className="text-xs text-primary-200">手目</span>
+          </div>
         </div>
       </div>
 
@@ -147,6 +160,9 @@ export function GameScreen({
         </div>
 
         <div className="flex-1" />
+
+        {/* フッター */}
+        <Footer />
 
         {/* キーボード */}
         <Keyboard

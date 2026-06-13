@@ -7,6 +7,7 @@ import { useGame } from "@/hooks/useGame";
 import { SelectScreen } from "@/components/screens/SelectScreen";
 import { GameScreen } from "@/components/screens/GameScreen";
 import { ResultScreen } from "@/components/screens/ResultScreen";
+import { GiveUpScreen } from "@/components/screens/GiveUpScreen";
 
 export default function Home() {
   const [allWords, setAllWords] = useState<WordData[]>([]);
@@ -26,7 +27,7 @@ export default function Home() {
     }
   }, []);
 
-  const { state, candidates, startGame, inputChar, deleteChar, submit, retry, reset } =
+  const { state, candidates, startGame, inputChar, deleteChar, submit, retry, reset, giveUp } =
     useGame(allWords);
 
   if (state.phase === "select") {
@@ -50,6 +51,7 @@ export default function Home() {
         onDelete={deleteChar}
         onEnter={submit}
         onReset={reset}
+        onGiveUp={giveUp}
       />
     );
   }
@@ -58,6 +60,16 @@ export default function Home() {
     return (
       <ResultScreen
         state={{ ...state, phase: "result" as const }}
+        onRetry={retry}
+        onReset={reset}
+      />
+    );
+  }
+
+  if (state.phase === "giveup") {
+    return (
+      <GiveUpScreen
+        state={{ ...state, phase: "giveup" as const }}
         onRetry={retry}
         onReset={reset}
       />

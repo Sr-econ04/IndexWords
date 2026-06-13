@@ -3,6 +3,7 @@
 import type { GameState } from "@/types";
 import { calcTheoretical, calcRank, posLabel, filterLabel } from "@/lib/gameLogic";
 import { Button } from "@/components/ui/Button";
+import { Footer } from "@/components/ui/Footer";
 
 type ResultScreenProps = {
   state: GameState & { phase: "result" };
@@ -110,6 +111,7 @@ export function ResultScreen({ state, onRetry, onReset }: ResultScreenProps) {
           </Button>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
