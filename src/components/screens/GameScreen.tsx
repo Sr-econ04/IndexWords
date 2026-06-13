@@ -76,20 +76,10 @@ export function GameScreen({
             {filterLabel(filter)}
           </span>
         </div>
-
-        <div className="flex items-center gap-3">
-          {/* 降参ボタン */}
-          <button
-            onClick={onGiveUp}
-            className="text-xs text-gray-300 hover:text-white border border-gray-400 hover:border-white rounded-lg px-2 py-1 transition-colors"
-          >
-            降参
-          </button>
-          {/* 手数 */}
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-black text-white leading-none">{moves}</span>
-            <span className="text-xs text-primary-200">手目</span>
-          </div>
+        {/* 手数のみ */}
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-black text-white leading-none">{moves}</span>
+          <span className="text-xs text-primary-200">手目</span>
         </div>
       </div>
 
@@ -152,7 +142,15 @@ export function GameScreen({
 
         <div className="flex-1" />
 
-        <Footer />
+        {/* 降参ボタン：キーボードの直上に独立して配置 */}
+        <button
+          onClick={onGiveUp}
+          className="w-full py-2.5 rounded-xl border border-gray-300 text-gray-400 text-sm
+                     hover:border-red-300 hover:text-red-400 hover:bg-red-50
+                     active:bg-red-50 transition-colors"
+        >
+          降参する
+        </button>
 
         {/* キーボード */}
         <Keyboard
@@ -162,6 +160,9 @@ export function GameScreen({
           onEnter={onEnter}
           canEnter={canEnter}
         />
+
+        {/* フッターはキーボードの下 */}
+        <Footer />
       </div>
     </div>
   );
