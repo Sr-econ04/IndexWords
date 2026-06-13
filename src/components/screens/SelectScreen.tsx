@@ -25,11 +25,8 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
     <div className="min-h-screen bg-surface flex flex-col">
       {/* ヘッダー */}
       <div className="bg-primary-600 text-white px-5 pt-12 pb-8">
-        <p className="text-primary-200 text-sm font-medium mb-1">兵庫県 英単語帳</p>
-        <h1 className="font-black tracking-tight mb-1">
-          <span className="text-4xl">はば単</span>
-          <span className="text-xl text-primary-300 ml-3 font-bold tracking-widest">Index Words</span>
-        </h1>
+        <p className="text-primary-200 text-sm font-medium mb-1">探索型英単語ゲーム</p>
+        <h1 className="text-4xl font-black tracking-tight mb-2">Index Words</h1>
         {isReady ? (
           <p className="text-primary-100 text-sm">全{totalCount.toLocaleString()}語収録</p>
         ) : (
