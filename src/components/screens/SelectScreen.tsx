@@ -10,12 +10,12 @@ type SelectScreenProps = {
   onLoad: () => void;
 };
 
-const OPTIONS: { label: string; filter: FilterMode; emoji: string; desc: string }[] = [
-  { label: "全単語", filter: "all", emoji: "📚", desc: "すべての品詞を出題" },
-  { label: "名詞", filter: "noun", emoji: "🏷️", desc: "名詞だけを出題" },
-  { label: "動詞", filter: "verb", emoji: "⚡", desc: "動詞だけを出題" },
-  { label: "形容詞", filter: "adjective", emoji: "🎨", desc: "形容詞だけを出題" },
-  { label: "副詞", filter: "adverb", emoji: "💨", desc: "副詞だけを出題" },
+const OPTIONS: { label: string; filter: FilterMode; desc: string }[] = [
+  { label: "全単語", filter: "all", desc: "すべての品詞を出題" },
+  { label: "名詞", filter: "noun", desc: "名詞だけを出題" },
+  { label: "動詞", filter: "verb", desc: "動詞だけを出題" },
+  { label: "形容詞", filter: "adjective", desc: "形容詞だけを出題" },
+  { label: "副詞", filter: "adverb", desc: "副詞だけを出題" },
 ];
 
 export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: SelectScreenProps) {
@@ -84,7 +84,7 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
             </div>
 
             <div className="flex flex-col gap-3">
-              {OPTIONS.map(({ label, filter, emoji, desc }) => (
+              {OPTIONS.map(({ label, filter, desc }) => (
                 <button
                   key={filter}
                   onClick={() => onStart(filter)}
@@ -94,7 +94,6 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
                              active:bg-primary-50 active:border-primary-200
                              transition-colors text-left cursor-pointer"
                 >
-                  <span className="text-2xl">{emoji}</span>
                   <div>
                     <p className="font-bold text-gray-800 text-lg">{label}</p>
                     <p className="text-xs text-gray-400">{desc}</p>
