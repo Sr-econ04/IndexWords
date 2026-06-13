@@ -25,7 +25,6 @@ export function GameScreen({
   onEnter,
   onReset,
   onGiveUp,
-  onGiveUp,
 }: GameScreenProps) {
   const { pool, answer, input, moves, filter, rangeLowIndex, rangeHighIndex, usedWords } = state;
 
@@ -33,7 +32,6 @@ export function GameScreen({
 
   const inputLower = input.toLowerCase();
   const answerLower = answer.word.toLowerCase();
-  // 番兵インデックス: -1 は先頭より前、pool.length は末尾より後
   const isInitial = rangeLowIndex === -1 && rangeHighIndex === pool.length;
   const lowWord = rangeLowIndex >= 0 ? pool[rangeLowIndex]?.word.toLowerCase() : null;
   const highWord = rangeHighIndex < pool.length ? pool[rangeHighIndex]?.word.toLowerCase() : null;
@@ -44,13 +42,11 @@ export function GameScreen({
     (inputLower === lowWord || inputLower === highWord);
 
   const canEnter = input.length > 0 && existsInPool && !alreadyUsed && !isBoundary;
-
   const showDot = moves > 0;
+  const theoretical = calcTheoretical(pool.length);
 
-  // 入力中の単語の意味
   const inputWordData = input.length > 0 ? findWord(pool, input) : undefined;
 
-  // フィードバックメッセージ
   let feedbackMsg: { text: string; color: string } | null = null;
   if (input.length > 0) {
     if (alreadyUsed || isBoundary) {
@@ -64,7 +60,7 @@ export function GameScreen({
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
-      {/* ヘッダー：戻るボタン・品詞・手数のみ */}
+      {/* ヘッダー */}
       <div className="bg-primary-600 text-white px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
@@ -91,8 +87,8 @@ export function GameScreen({
           </button>
           {/* 手数 */}
           <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-black text-white leading-none">{moves}</span>
-          <span className="text-xs text-primary-200">手目</span>
+            <span className="text-2xl font-black text-white leading-none">{moves}</span>
+            <span className="text-xs text-primary-200">手目</span>
           </div>
         </div>
       </div>
@@ -100,9 +96,8 @@ export function GameScreen({
       {/* メインエリア */}
       <div className="flex-1 flex flex-col w-full max-w-lg mx-auto px-4 py-4 gap-4">
 
-        {/* 残り候補数 + ヒントバー：カードの中に大きく配置 */}
+        {/* 残り候補数 + ヒントバー */}
         <div className="bg-card rounded-2xl p-4 shadow-sm border border-gray-100">
-          {/* 残り候補数を上部に大きく表示 */}
           <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-xs text-gray-400 mb-0.5">残り候補数</p>
@@ -117,8 +112,6 @@ export function GameScreen({
             </div>
             <p className="text-xs text-gray-300 pb-0.5">探索範囲</p>
           </div>
-
-          {/* ヒントバー */}
           <RangeBar
             candidates={candidates}
             answer={answer}
@@ -146,8 +139,6 @@ export function GameScreen({
             )}
           </div>
           <div className={`mt-1 h-0.5 rounded ${alreadyUsed || isBoundary ? "bg-red-200" : "bg-primary-200"}`} />
-
-          {/* 意味 or フィードバック */}
           {inputWordData && !alreadyUsed && !isBoundary ? (
             <p className="mt-2 text-sm text-gray-600 font-medium">{inputWordData.meaning}</p>
           ) : (
@@ -161,7 +152,6 @@ export function GameScreen({
 
         <div className="flex-1" />
 
-        {/* フッター */}
         <Footer />
 
         {/* キーボード */}
