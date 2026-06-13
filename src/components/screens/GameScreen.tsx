@@ -41,12 +41,11 @@ export function GameScreen({
   const canEnter = input.length > 0 && existsInPool && !alreadyUsed && !isBoundary;
 
   const showDot = moves > 0;
-  const theoretical = calcTheoretical(pool.length);
 
-  // 入力中の単語の意味（プール内に存在すれば表示）
+  // 入力中の単語の意味
   const inputWordData = input.length > 0 ? findWord(pool, input) : undefined;
 
-  // 入力フィードバックメッセージ
+  // フィードバックメッセージ
   let feedbackMsg: { text: string; color: string } | null = null;
   if (input.length > 0) {
     if (alreadyUsed || isBoundary) {
@@ -60,8 +59,8 @@ export function GameScreen({
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
-      {/* ヘッダー */}
-      <div className="bg-primary-600 text-white px-4 py-3 flex justify-between items-center relative">
+      {/* ヘッダー：戻るボタン・品詞・手数のみ */}
+      <div className="bg-primary-600 text-white px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
             onClick={onReset}
@@ -76,22 +75,36 @@ export function GameScreen({
             {filterLabel(filter)}
           </span>
         </div>
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-baseline gap-1">
+
+        {/* 手数：現在の回答数のみ、上限のイメージを与えない */}
+        <div className="flex items-baseline gap-1">
           <span className="text-2xl font-black text-white leading-none">{moves}</span>
-          <span className="text-xs text-primary-200">/ {theoretical}手</span>
-        </div>
-        <div className="flex items-baseline gap-0.5">
-          <span className="text-sm font-bold text-white">{candidates.length.toLocaleString()}</span>
-          <span className="text-xs text-primary-300">語</span>
+          <span className="text-xs text-primary-200">手目</span>
         </div>
       </div>
 
       {/* メインエリア */}
       <div className="flex-1 flex flex-col w-full max-w-lg mx-auto px-4 py-4 gap-4">
 
-        {/* ヒントバー */}
+        {/* 残り候補数 + ヒントバー：カードの中に大きく配置 */}
         <div className="bg-card rounded-2xl p-4 shadow-sm border border-gray-100">
-          <p className="text-xs text-gray-400 font-medium mb-3">探索範囲</p>
+          {/* 残り候補数を上部に大きく表示 */}
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <p className="text-xs text-gray-400 mb-0.5">残り候補数</p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-black text-primary-600 leading-none">
+                  {candidates.length.toLocaleString()}
+                </span>
+                <span className="text-sm text-gray-400">
+                  / {pool.length.toLocaleString()}語
+                </span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-300 pb-0.5">探索範囲</p>
+          </div>
+
+          {/* ヒントバー */}
           <RangeBar
             candidates={candidates}
             answer={answer}
@@ -120,11 +133,9 @@ export function GameScreen({
           </div>
           <div className={`mt-1 h-0.5 rounded ${alreadyUsed || isBoundary ? "bg-red-200" : "bg-primary-200"}`} />
 
-          {/* 入力した単語の意味 */}
+          {/* 意味 or フィードバック */}
           {inputWordData && !alreadyUsed && !isBoundary ? (
-            <p className="mt-2 text-sm text-gray-600 font-medium">
-              {inputWordData.meaning}
-            </p>
+            <p className="mt-2 text-sm text-gray-600 font-medium">{inputWordData.meaning}</p>
           ) : (
             <p className="mt-1.5 text-xs h-4">
               {feedbackMsg && (
