@@ -14,6 +14,7 @@ const RANK_CONFIG: Record<
   string,
   { label: string; color: string; bg: string; message: string }
 > = {
+  SS: { label: "SS", color: "text-purple-600", bg: "bg-purple-50 border-purple-200", message: "✨ 一発正解！伝説のプレイヤー！" },
   S: { label: "S", color: "text-yellow-600", bg: "bg-yellow-50 border-yellow-200", message: "完璧！理論を超えた神プレイ！" },
   A: { label: "A", color: "text-primary-600", bg: "bg-primary-50 border-primary-200", message: "すばらしい！ほぼ完璧な絞り込み！" },
   B: { label: "B", color: "text-green-600", bg: "bg-green-50 border-green-200", message: "いい感じ！もう少しで理論値だ！" },
@@ -24,7 +25,8 @@ const RANK_CONFIG: Record<
 export function ResultScreen({ state, onRetry, onReset }: ResultScreenProps) {
   const { answer, moves } = state;
   const theoretical = calcTheoretical(state.pool.length);
-  const rank = calcRank(moves, theoretical);
+  // 1手で正解した場合のみSSランク（隠し要素）
+  const rank = moves === 1 ? "SS" : calcRank(moves, theoretical);
   const config = RANK_CONFIG[rank];
 
   return (

@@ -153,7 +153,7 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
                       <div className="relative flex flex-col items-center" style={{ transform: "translateX(-50%)" }}>
                         <div className="w-4 h-4 rounded-full bg-orange-400 border-2 border-white shadow" />
                         <p className="text-xs text-orange-400 font-medium whitespace-nowrap mt-1">
-                          ▲ 正解はこのあたり
+                          正解はこのあたり
                         </p>
                       </div>
                     </div>
