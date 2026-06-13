@@ -187,7 +187,7 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
           </div>
         </div>
       </div>
+      <Footer />
     </div>
-    <Footer />
   );
 }
