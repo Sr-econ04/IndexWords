@@ -1,6 +1,6 @@
 # Index Words
 
-探索型英単語ゲームです。
+探索型英単語ゲームです。  
 兵庫県の中学生向け英単語帳「はば単（第２版）」を使用しています。
 
 
@@ -50,9 +50,9 @@
 
 ## ローカルでの起動方法
 
-git clone https://github.com/あなたのユーザー名/IndexWords.git\\
-cd IndexWords\\
-npm install\\
-npm run dev\\
+git clone https://github.com/あなたのユーザー名/IndexWords.git  
+cd IndexWords  
+npm install  
+npm run dev  
 
 ブラウザで http://localhost:3000 を開く
