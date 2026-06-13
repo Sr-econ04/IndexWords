@@ -107,14 +107,49 @@ export function SelectScreen({ totalCount, loading, error, onStart, onLoad }: Se
         )}
 
         {/* ゲーム説明 */}
-        <div className="bg-primary-50 rounded-2xl p-4">
-          <p className="text-primary-800 text-sm font-bold mb-2">🎮 あそびかた</p>
-          <ul className="text-primary-700 text-xs space-y-1">
-            <li>・ 正解の単語を探索して当てよう</li>
-            <li>・ 回答するたびに範囲がせばまるよ</li>
-            <li>・ 最初の回答でバーに位置が表示されるよ</li>
-            <li>・ 少ない手数ほど高スコア！</li>
-          </ul>
+        <div className="bg-primary-50 rounded-2xl p-4 space-y-3">
+          <p className="text-primary-800 text-sm font-bold">🎮 あそびかた</p>
+
+          <div className="text-primary-700 text-xs space-y-2">
+            <p className="font-semibold">① 正解の単語をキーボードで入力しよう</p>
+            <p className="text-primary-600 leading-relaxed">
+              英単語を入力してENTERを押すと、正解より前か後かがわかります。
+              この情報をもとに探索範囲をせばめていきます。
+            </p>
+          </div>
+
+          <div className="text-primary-700 text-xs space-y-2">
+            <p className="font-semibold">② バーで正解の位置を確認しよう</p>
+            <p className="text-primary-600 leading-relaxed">
+              最初の回答をすると、バーにオレンジの●が表示されます。
+              ●の位置が正解単語のだいたいの場所を表しています。
+            </p>
+            <div className="bg-white rounded-lg px-3 py-2 font-mono text-primary-400">
+              <div className="flex justify-between text-xs mb-1">
+                <span>angry</span><span>teacher</span>
+              </div>
+              <div className="relative h-3 bg-primary-100 rounded-full">
+                <div className="absolute w-3 h-3 rounded-full bg-accent border border-white" style={{left: "60%"}} />
+              </div>
+              <p className="text-center text-xs mt-1 text-primary-300">← 正解はこのあたり</p>
+            </div>
+          </div>
+
+          <div className="text-primary-700 text-xs space-y-2">
+            <p className="font-semibold">③ キーボードのヒントを活用しよう</p>
+            <p className="text-primary-600 leading-relaxed">
+              グレーのキーは現在の候補に存在しない文字です。
+              白いキーだけを使って単語を絞り込みましょう。
+            </p>
+          </div>
+
+          <div className="text-primary-700 text-xs space-y-1">
+            <p className="font-semibold">④ スコアについて</p>
+            <p className="text-primary-600 leading-relaxed">
+              理論上の最小手数（例：2,000語なら11手）と比べてランクが決まります。
+              少ない手数ほど高ランク！
+            </p>
+          </div>
         </div>
       </div>
     </div>

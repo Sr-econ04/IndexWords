@@ -14,33 +14,32 @@ export function filterWords(words: WordData[], filter: FilterMode): WordData[] {
 }
 
 /**
- * 探索範囲内の候補を返す（上限・下限の単語自体は除外 = exclusive）
- * ただし正解単語は除外しない
+ * 探索範囲内の候補を返す。
+ * lowIndex / highIndex は「境界の番兵インデックス」で、
+ * 初期値は lowIndex = -1、highIndex = pool.length（範囲外）。
+ * 実際の候補は pool[lowIndex+1] 〜 pool[highIndex-1]。
+ * 正解単語は常に候補に含む。
  */
 export function getCandidates(
   pool: WordData[],
-  lowIndex: number,
-  highIndex: number,
+  lowIndex: number,   // -1 = 先頭より前（番兵）
+  highIndex: number,  // pool.length = 末尾より後（番兵）
   answerWord: string
 ): WordData[] {
-  return pool.slice(lowIndex, highIndex + 1).filter((w, i) => {
-    const isLower = lowIndex + i === lowIndex;
-    const isUpper = lowIndex + i === highIndex;
-    const isAnswer = w.word.toLowerCase() === answerWord.toLowerCase();
-    // 境界単語でも正解なら残す
-    if (isAnswer) return true;
-    // 初期状態（全体範囲）は除外しない
-    if (lowIndex === 0 && highIndex === pool.length - 1) return true;
-    // 境界単語を除外
-    if (isLower || isUpper) return false;
-    return true;
-  });
+  const from = lowIndex + 1;
+  const to = highIndex - 1;
+  if (from > to) {
+    // 範囲が縮まりきった場合は正解だけ返す
+    const ans = pool.find((w) => w.word.toLowerCase() === answerWord.toLowerCase());
+    return ans ? [ans] : [];
+  }
+  return pool.slice(from, to + 1);
 }
 
 /**
- * 回答後の範囲更新
- * answer > guess → 下限をguessに更新
- * answer < guess → 上限をguessに更新
+ * 回答後の範囲更新。
+ * answer > guess → 下限をguessのインデックスに更新
+ * answer < guess → 上限をguessのインデックスに更新
  */
 export function updateRange(
   pool: WordData[],
@@ -60,11 +59,13 @@ export function updateRange(
   const guessLower = guessWord.toLowerCase();
 
   if (answerLower > guessLower) {
+    // 正解はguessより後ろ → 下限をguessに
     return {
       rangeLowIndex: Math.max(guessIndex, currentLow),
       rangeHighIndex: currentHigh,
     };
   } else {
+    // 正解はguessより前 → 上限をguessに
     return {
       rangeLowIndex: currentLow,
       rangeHighIndex: Math.min(guessIndex, currentHigh),

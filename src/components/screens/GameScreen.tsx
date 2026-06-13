@@ -29,13 +29,14 @@ export function GameScreen({
 
   const inputLower = input.toLowerCase();
   const answerLower = answer.word.toLowerCase();
-  const isInitial = rangeLowIndex === 0 && rangeHighIndex === pool.length - 1;
-  const lowWord = pool[rangeLowIndex]?.word.toLowerCase();
-  const highWord = pool[rangeHighIndex]?.word.toLowerCase();
+  // 番兵インデックス: -1 は先頭より前、pool.length は末尾より後
+  const isInitial = rangeLowIndex === -1 && rangeHighIndex === pool.length;
+  const lowWord = rangeLowIndex >= 0 ? pool[rangeLowIndex]?.word.toLowerCase() : null;
+  const highWord = rangeHighIndex < pool.length ? pool[rangeHighIndex]?.word.toLowerCase() : null;
 
   const existsInPool = pool.some((w) => w.word.toLowerCase() === inputLower);
   const alreadyUsed = usedWords.has(inputLower);
-  const isBoundary = !isInitial && inputLower !== answerLower &&
+  const isBoundary = inputLower !== answerLower &&
     (inputLower === lowWord || inputLower === highWord);
 
   const canEnter = input.length > 0 && existsInPool && !alreadyUsed && !isBoundary;
@@ -108,8 +109,8 @@ export function GameScreen({
           <RangeBar
             candidates={candidates}
             answer={answer}
-            lowWord={isInitial ? null : pool[rangeLowIndex]?.word ?? null}
-            highWord={isInitial ? null : pool[rangeHighIndex]?.word ?? null}
+            lowWord={lowWord ?? null}
+            highWord={highWord ?? null}
             showDot={showDot}
           />
         </div>
